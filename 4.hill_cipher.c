@@ -1,43 +1,76 @@
-  #include<stdio.h>
-    #include<string.h>
-    int main() 
+#include<stdio.h>
+#include<string.h>
+#include<math.h>
+#include<stdlib.h>
+#define MAX_SIZE 10
+
+void hillCipherEncrypt(int key[MAX_SIZE][MAX_SIZE], int keySize, char *message) 
+{
+    int i, j, k, len, sum;
+    len = strlen(message);
+    int encrypted[len];
+    
+    while (len % keySize != 0) 
     {
-        unsigned int a[5][5] = { { 6, 24, 1,5,1 }, { 13, 16, 10 ,4,1}, { 20, 17, 15,5,13 } , { 8, 5,12,13, 10 }, { 23,1,21, 8, 21 }};
-        unsigned int b[5][5] = { { 8, 5, 10,3,1}, { 21, 8, 21,11,4}, {7,14,21,12,8}, {3,14,2,11,28},{ 18, 5, 10,13,11}};
-        int i, j;
-        unsigned int c[20], d[20];
-        char msg[20];
-        int determinant = 0, t = 0;
-        printf("Enter plain text\n ");
-        scanf("%s", msg);
-        for (i = 0; i < 5; i++) 
-        {
-            c[i] = msg[i] - 65;
-            printf("%d ", c[i]);
-        }
-        for (i = 0; i < 5; i++) 
-        {
-            t = 0;
-            for (j = 0; j < 5; j++) 
-            {
-                t = t + (a[i][j] * c[j]);
-            }
-            d[i] = t % 26;
-        }
-        printf("\nEncrypted Cipher Text :");
-        for (i = 0; i < 5; i++)
-            printf(" %c", d[i] + 65);
-        for (i = 0; i < 5; i++)
-        {
-            t = 0;
-            for (j = 0; j < 5; j++) 
-            {
-                t = t + (b[i][j] * d[j]);
-            }
-            c[i] = t % 26;
-        }
-        printf("\nDecrypted Cipher Text :");
-        for (i = 0; i < 5; i++)
-            printf(" %c", c[i] + 65);
-        return 0;
+        message[len] = 'X';
+        len++;
     }
+    message[len] = '\0';
+    
+    for (i = 0; i < len; i += keySize) 
+    {
+        for (j = 0; j < keySize; j++) 
+        {
+            sum = 0;
+            for (k = 0; k < keySize; k++) 
+            {
+                sum += key[k][j] * (message[i + k] - 'A');
+            }
+            encrypted[i + j] = sum % 26;
+        }
+    }
+    
+    printf("Encrypted Message: ");
+    for (i = 0; i < len; i++) 
+    {
+        printf("%c", encrypted[i] + 'A');
+    }
+    printf("\n");
+}
+
+int main() 
+{
+    int key[MAX_SIZE][MAX_SIZE];
+    int keySize, i, j;
+    char message[1000];
+    
+    printf("Enter key size (square matrix size): ");
+    scanf("%d", &keySize);
+    
+    printf("Enter key matrix elements:\n");
+    for (i = 0; i < keySize; i++) 
+    {
+        for (j = 0; j < keySize; j++) 
+        {
+            printf("Enter element [%d][%d]: ", i, j);
+            scanf("%d", &key[i][j]);
+        }
+    }
+    
+    printf("The Key Matrix is:\n");
+    for (i = 0; i < keySize; i++) 
+    {
+        for (j = 0; j < keySize; j++) 
+        {
+            printf("%d\t",key[i][j]);
+        }
+        printf("\n");
+    }
+    
+    printf("Enter the message to be encrypted (in capital letters): ");
+    scanf("%s", message);
+    
+    hillCipherEncrypt(key, keySize, message);
+    
+    return 0;
+}
